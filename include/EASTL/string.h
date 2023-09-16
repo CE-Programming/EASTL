@@ -342,14 +342,14 @@ namespace eastl
 			size_type mnCapacity; // Capacity of the string. Number of characters string can hold, not including the trailing '0'
 		};
 
-		template <typename CharT, size_t = sizeof(CharT)>
+		template <size_t N>
 		struct SSOPadding
 		{
-			char padding[sizeof(CharT) - sizeof(char)];
+			char padding[N - sizeof(char)];
 		};
 
-		template <typename CharT>
-		struct SSOPadding<CharT, 1>
+		template <>
+		struct SSOPadding<1>
 		{
 			// template specialization to remove the padding structure to avoid warnings on zero length arrays
 			// also, this allows us to take advantage of the empty-base-class optimization.
@@ -359,15 +359,13 @@ namespace eastl
 		struct SSOLayout
 		{
 			static EA_CONSTEXPR_OR_CONST size_type SSO_CAPACITY = (sizeof(HeapLayout) - sizeof(char)) / sizeof(value_type);
+			value_type mData[SSO_CAPACITY]; // Local buffer for string data.
 
-			// mnSize must correspond to the last byte of HeapLayout.mnCapacity, so we don't want the compiler to insert
-			// padding after mnSize if sizeof(value_type) != 1; Also ensures both layouts are the same size.
-			struct SSOSize : SSOPadding<value_type>
+			// mnRemainingSize must correspond to the last byte of HeapLayout.mnCapacity
+			struct SSOSize : SSOPadding<sizeof(HeapLayout) - sizeof(mData)>
 			{
 				char mnRemainingSize;
 			};
-
-			value_type mData[SSO_CAPACITY]; // Local buffer for string data.
 			SSOSize mRemainingSizeField;
 		};
 
