@@ -636,16 +636,29 @@ namespace eastl
 	{
 		using size_t_sized_floating_point_type = eastl::conditional_t<sizeof(size_t) == sizeof(double), double, float>;
 
-		template <typename T>
-		size_t floating_point_hash(T val)
-		{
-			if (val == -0.0)
+		#ifndef _EZ80
+			template <typename T>
+			size_t floating_point_hash(T val)
 			{
-				return eastl::bit_cast<size_t>(static_cast<internal::size_t_sized_floating_point_type>(0.0));
-			}
+				if (val == -0.0)
+				{
+					return eastl::bit_cast<size_t>(static_cast<internal::size_t_sized_floating_point_type>(0.0));
+				}
 
-			return eastl::bit_cast<size_t>(static_cast<internal::size_t_sized_floating_point_type>(val));
-		}
+				return eastl::bit_cast<size_t>(static_cast<internal::size_t_sized_floating_point_type>(val));
+			}
+		#else
+			template <typename T>
+			size_t floating_point_hash(T val)
+			{
+				if (val == -0.0)
+				{
+					return static_cast<size_t>(static_cast<internal::size_t_sized_floating_point_type>(0.0));
+				}
+
+				return static_cast<size_t>(static_cast<internal::size_t_sized_floating_point_type>(val));
+			}
+		#endif
 	}
 
 	template <> struct hash<float>
