@@ -4000,6 +4000,7 @@ namespace eastl
 #endif
 	};
 
+#ifndef _EZ80
 	/// to_string
 	///
 	/// Converts integral types to an eastl::string with the same content that sprintf produces.  The following
@@ -4026,7 +4027,7 @@ namespace eastl
 		{ return string(string::CtorSprintf(), "%f", value); }
 	inline string to_string(long double value)
 		{ return string(string::CtorSprintf(), "%Lf", value); }
-
+#endif /* _EZ80 */
 
 	/// to_wstring
 	///
